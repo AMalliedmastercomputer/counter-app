@@ -1,6 +1,7 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import {
+  AlertController,
   IonButton,
   IonContent,
   IonHeader,
@@ -14,6 +15,7 @@ import {
   IonSpinner,
   IonTitle,
   IonToolbar,
+  ToastController,
 } from '@ionic/angular';
 import { CounterService } from '../services/counter.service';
 
@@ -44,6 +46,8 @@ export class Tab2Page implements OnInit {
   readonly counterService = inject(CounterService);
   readonly searchTerm = signal('');
   readonly sortMode = signal<SortMode>('newest');
+  private readonly alertController = inject(AlertController);
+  private readonly toastController = inject(ToastController);
 
   readonly visibleCounters = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
@@ -89,9 +93,38 @@ export class Tab2Page implements OnInit {
 
   async remove(id: string): Promise<void> {
     await this.counterService.remove(id);
+    const toast = await this.toastController.create({
+      message: 'Záznam byl odstraněn.',
+      duration: 1800,
+      position: 'bottom',
+    });
+    await toast.present();
   }
 
   async clear(): Promise<void> {
-    await this.counterService.clear();
+    const alert = await this.alertController.create({
+      header: 'Vymazat celou historii?',
+      message: 'Tato akce smaže všechny uložené záznamy. Tuto akci nelze vrátit.',
+      buttons: [
+        {
+          text: 'Zrušit',
+          role: 'cancel',
+        },
+        {
+          text: 'Vymazat',
+          handler: async () => {
+            await this.counterService.clear();
+            const toast = await this.toastController.create({
+              message: 'Historie byla vymazána.',
+              duration: 1800,
+              position: 'bottom',
+            });
+            await toast.present();
+          },
+        },
+      ],
+    });
+
+    await alert.present();
   }
 }
