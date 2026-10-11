@@ -82,10 +82,19 @@ describe('CounterService', () => {
     await service.add(second);
 
     expect(service.counters()).toEqual([second, first]);
+    expect(service.totalValue()).toBe(3);
     expect(setMock).toHaveBeenCalledWith({
       key: 'saved-counters',
       value: JSON.stringify([second, first]),
     });
+  });
+
+  it('calculates the sum of all saved counter values', async () => {
+    getMock.mockResolvedValue({ value: JSON.stringify([first, second]) });
+
+    await service.initialize();
+
+    expect(service.totalValue()).toBe(3);
   });
 
   it('removes only the matching counter and persists the updated list', async () => {
