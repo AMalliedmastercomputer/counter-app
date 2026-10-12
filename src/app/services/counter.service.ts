@@ -16,6 +16,14 @@ export class CounterService {
   readonly totalValue = computed(() =>
     this.countersState().reduce((sum, counter) => sum + counter.value, 0),
   );
+  readonly valueCounts = computed(() => {
+    const counters = this.countersState();
+    return {
+      positive: counters.filter((counter) => counter.value > 0).length,
+      negative: counters.filter((counter) => counter.value < 0).length,
+      zero: counters.filter((counter) => counter.value === 0).length,
+    };
+  });
 
   initialize(): Promise<void> {
     this.initializationPromise ??= this.load();

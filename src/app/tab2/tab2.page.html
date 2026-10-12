@@ -17,6 +17,11 @@
       <div class="history-summary">
         <p>Počet záznamů: {{ counterService.counters().length }}</p>
         <p>Součet hodnot: {{ counterService.totalValue() }}</p>
+        <p>
+          Kladné: {{ counterService.valueCounts().positive }} ·
+          záporné: {{ counterService.valueCounts().negative }} ·
+          nulové: {{ counterService.valueCounts().zero }}
+        </p>
         <p>Zobrazeno: {{ visibleCounters().length }}</p>
       </div>
 

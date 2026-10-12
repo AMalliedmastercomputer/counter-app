@@ -33,6 +33,11 @@ describe('CounterService', () => {
     createdAt: '2026-09-17T09:00:00.000Z',
   };
 
+  const nonPositiveCounters: SavedCounter[] = [
+    { ...first, id: 'negative', value: -1 },
+    { ...second, id: 'zero', value: 0 },
+  ];
+
   beforeEach(() => {
     // Vynulujeme počty volání mocků z předchozího testu.
     vi.clearAllMocks();
@@ -95,6 +100,20 @@ describe('CounterService', () => {
     await service.initialize();
 
     expect(service.totalValue()).toBe(3);
+  });
+
+  it('counts positive, negative, and zero counter values', async () => {
+    getMock.mockResolvedValue({
+      value: JSON.stringify([first, ...nonPositiveCounters]),
+    });
+
+    await service.initialize();
+
+    expect(service.valueCounts()).toEqual({
+      positive: 1,
+      negative: 1,
+      zero: 1,
+    });
   });
 
   it('removes only the matching counter and persists the updated list', async () => {
